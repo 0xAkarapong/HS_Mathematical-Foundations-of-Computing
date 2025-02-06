@@ -47,3 +47,16 @@ print("\nFunction 3:")
 print(f"Root: {root_3}")
 print(f"Iterations: {iterations_3}")
 print(f"Converged: {converged_3}")
+
+def g4(x):
+    return x**2 - 2 * x
+
+x0_4 = 3
+tolerance_4 = 1e-6
+max_iterations_4 = 100
+root_4, iterations_4, converged_4 = fixed_point_iteration(g4, x0_4, tolerance_4, max_iterations_4)
+
+print("\nFunction 4:")
+print(f"Root: {root_4}")
+print(f"Iterations: {iterations_4}")
+print(f"Converged: {converged_4}")
