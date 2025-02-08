@@ -20,5 +20,8 @@ def index():
     render_template('home.html')
 
 @app.route("calculate", methods=['POST'])
+def calculate():
+    pass
+
 if __name__ == "__main__":
     app.run(debug=True)
