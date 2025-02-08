@@ -6,10 +6,24 @@ x = symbols('x')
 
 app = Flask(__name__)
 
-def bisection_method():
-    pass
+def bisection_method(f, a, b, tolerance, max_iterations=100):
+    if f(a) * f(b) >= 0:
+        return None, 0, []
+    
+    errors = list()
+    for i in range(max_iterations):
+        c = (a + b) / 2
+        error = abs(b - a) / 2
+        errors.append(error)
+        if f(c) == 0 or (b - a) / 2 < tolerance:
+            return c, i, errors
+        if f(c) * f(a) < 0:
+            b = c
+        else:
+            a = c
+    return c, max_iterations, errors
 
-def newton_raphson_method():
+def newton_raphson_method(f, a, b, tolerance, max_iterations=100):
     pass
 
 def get_expression(expression):
