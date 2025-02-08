@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request
-from sympy import symbols, sympify
+import sympy as sp
+import matplotlib.pyplot as plt
 import numpy as np
-
-x = symbols('x')
 
 app = Flask(__name__)
 
@@ -34,9 +33,6 @@ def newton_raphson_method(f, x0, tolerance, max_iterations=100):
         x0 = x1
     return x1, max_iterations, errors
 
-def get_expression(expression):
-    return sympify(expression)
-
 @app.route("/")
 def index():
     render_template('home.html')
@@ -60,6 +56,16 @@ def calculate():
         return "Interval a must be less than b"
     if tolerance <= 0:
         return "Tolerance must be greater than 0"
+
+    x = sp.symbols('x')
+
+    try:
+        f_sympy = sp.sympify(function_str)
+        f = sp.lambdify(x, f_sympy, 'numpy')
+        df_sympy = sp.diff(f_sympy, x)
+        df = sp.lambdify(x, df_sympy, 'numpy')
+    except:
+        return "Invalid function"
 
 
 if __name__ == "__main__":
