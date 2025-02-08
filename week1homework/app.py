@@ -23,8 +23,16 @@ def bisection_method(f, a, b, tolerance, max_iterations=100):
             a = c
     return c, max_iterations, errors
 
-def newton_raphson_method(f, a, b, tolerance, max_iterations=100):
-    pass
+def newton_raphson_method(f, x0, tolerance, max_iterations=100):
+    errors = list()
+    for i in range(max_iterations):
+        x1 = x0 - f(x0) / f(x).diff(x).subs(x, x0)
+        error = abs(x1 - x0)
+        errors.append(error)
+        if error < tolerance:
+            return x1, i, errors
+        x0 = x1
+    return x1, max_iterations, errors
 
 def get_expression(expression):
     return sympify(expression)
