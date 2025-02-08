@@ -28,6 +28,16 @@ def calculate():
     tolerance_str = request.form['tolerance']
 
     # Convert a b and tolerance to float
+    a = float(a_str)
+    b = float(b_str)
+    tolerance = float(tolerance_str)
+    del a_str, b_str, tolerance_str
+
+    # Check if the input is valid
+    if b >= a:
+        return "Interval a must be less than b"
+    if tolerance <= 0:
+        return "Tolerance must be greater than 0"
 
 
 if __name__ == "__main__":
