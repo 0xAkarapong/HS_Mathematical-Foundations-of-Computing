@@ -21,7 +21,14 @@ def index():
 
 @app.route("calculate", methods=['POST'])
 def calculate():
-    pass
+    # Input Part
+    function_str = request.form['function']
+    a_str = request.form['interval_a']
+    b_str = request.form['interval_b']
+    tolerance_str = request.form['tolerance']
+
+    # Convert a b and tolerance to float
+
 
 if __name__ == "__main__":
     app.run(debug=True)
