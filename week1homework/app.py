@@ -6,11 +6,19 @@ x = symbols('x')
 
 app = Flask(__name__)
 
-@app.route("/", methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        expression = request.form['expression']
-        return render_template("home.html", expression=expression)
+def bisection_method():
+    pass
 
+def newton_raphson_method():
+    pass
+
+def get_expression(expression):
+    return sympify(expression)
+
+@app.route("/")
+def index():
+    render_template('home.html')
+
+@app.route("calculate", methods=['POST'])
 if __name__ == "__main__":
     app.run(debug=True)
