@@ -67,6 +67,17 @@ def calculate():
     except (sp.SympifyError, TypeError, ValueError) as e:
         return render_template('index.html', error=f"Invalid function: {e}")
 
+    try:
+        f(a)  # Test evaluation at interval endpoints
+        f(b)
+        df(a)
+        df(b)
+    except (ValueError, TypeError, ZeroDivisionError) as e:
+        return render_template('index.html', error=f"Function evaluation error at interval endpoints: {e}")
+
+    # Algorithm Part
+    newton_root, newton_iterations, newton_errors = newton_raphson_method(f, df, (a + b) / 2, tolerance)
+    bisection_root, bisection_iterations, bisection_errors = bisection_method(f, a, b, tolerance)
 
 if __name__ == "__main__":
     app.run(debug=True)
