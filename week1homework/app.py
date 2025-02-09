@@ -1,39 +1,48 @@
 from flask import Flask, render_template, request
 import sympy as sp
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 from io import BytesIO
 import base64
 
+
 app = Flask(__name__)
 
 def bisection_method(f, a, b, tolerance, max_iterations=100):
     if f(a) * f(b) >= 0:
-        return None, 0, []
-    
-    errors = list()
+        return None, -1, [] 
+
+    errors = []
     for i in range(max_iterations):
         c = (a + b) / 2
         error = abs(b - a) / 2
         errors.append(error)
-        if f(c) == 0 or (b - a) / 2 < tolerance:
-            return c, i, errors
-        if f(c) * f(a) < 0:
+        if abs(f(c)) < 1e-15 or error < tolerance:
+            return c, i + 1, errors
+        if f(a) * f(c) < 0:
             b = c
         else:
             a = c
-    return c, max_iterations, errors
+    return None, max_iterations, errors
 
-def newton_raphson_method(f, x0, tolerance, max_iterations=100):
-    errors = list()
+def newton_raphson_method(f, df, x0, tolerance, max_iterations=100):
+    errors = []
+    x = x0
     for i in range(max_iterations):
-        x1 = x0 - f(x0) / f(x).diff(x).subs(x, x0)
-        error = abs(x1 - x0)
+        fx = f(x)
+        dfx = df(x)
+        if dfx == 0:
+            return None, -1, []
+
+        x1 = x - fx / dfx
+        error = abs(x1 - x)
         errors.append(error)
         if error < tolerance:
-            return x1, i, errors
-        x0 = x1
-    return x1, max_iterations, errors
+            return x1, i + 1, errors
+        x = x1
+    return None, max_iterations, errors
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -41,8 +50,8 @@ def index():
     if request.method == 'POST':
         try:
             function_str = request.form['function']
-            a_str = request.form['interval_a']
-            b_str = request.form['interval_b']
+            a_str = request.form['a']
+            b_str = request.form['b']
             tolerance_str = request.form['tolerance']
 
             # Convert a b and tolerance to float
@@ -51,7 +60,7 @@ def index():
             tolerance = float(tolerance_str)
 
             # Check if the input is valid
-            if b >= a:
+            if a >= b:
                 return render_template('index.html', error="Invalid interval: 'a' must be less than 'b'.")
             if tolerance <= 0:
                 return render_template('index.html', error="Invalid tolerance: Tolerance must be greater then zero")
@@ -87,6 +96,7 @@ def index():
             plt.yscale("log")
             plt.title("Convergence Comparison")
             plt.grid(True)
+            plt.legend()
 
             # Image Part
             img =  BytesIO()
