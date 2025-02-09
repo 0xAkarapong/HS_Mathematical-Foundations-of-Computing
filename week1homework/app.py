@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import sympy as sp
 import matplotlib.pyplot as plt
 import numpy as np
+from io import BytesIO
 
 app = Flask(__name__)
 
@@ -89,7 +90,15 @@ def calculate():
         plt.yscale("log")
         plt.title("Convergence Comparison")
         plt.grid(True)
-        
+
+        # Image Part
+        img =  BytesIO()
+        plt.savefig(img, format='png')
+        plt.close()
+        img.seek(0)
+        plot_url = base64.b64encode(img.getvalue()).decode('utf8')
+
+
     return render_template('index.html')
 
 if __name__ == "__main__":
