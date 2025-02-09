@@ -79,5 +79,10 @@ def calculate():
     newton_root, newton_iterations, newton_errors = newton_raphson_method(f, df, (a + b) / 2, tolerance)
     bisection_root, bisection_iterations, bisection_errors = bisection_method(f, a, b, tolerance)
 
+    # Graph plotting
+    plt.figure(figsize=(8, 6)
+    plt.plot(newton_errors, label="Newton-Raphson")
+    plt.plot(bisection_errors, label="Bisection")
+
 if __name__ == "__main__":
     app.run(debug=True)
