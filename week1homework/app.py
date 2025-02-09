@@ -35,71 +35,72 @@ def newton_raphson_method(f, x0, tolerance, max_iterations=100):
         x0 = x1
     return x1, max_iterations, errors
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def index():
-    render_template('index.html')
-
-@app.route("calculate", methods=['POST'])
-def calculate():
     # Input Part
     if request.method == 'POST':
-        function_str = request.form['function']
-        a_str = request.form['interval_a']
-        b_str = request.form['interval_b']
-        tolerance_str = request.form['tolerance']
-
-        # Convert a b and tolerance to float
-        a = float(a_str)
-        b = float(b_str)
-        tolerance = float(tolerance_str)
-
-        # Check if the input is valid
-        if b >= a:
-            return render_template('index.html', error="Invalid interval: 'a' must be less than 'b'.")
-        if tolerance <= 0:
-            return render_template('index.html', error="Invalid tolerance: Tolerance must be greater then zero")
-
-        x = sp.symbols('x')
-
         try:
-            f_sympy = sp.sympify(function_str)
-            f = sp.lambdify(x, f_sympy, 'numpy')
-            df_sympy = sp.diff(f_sympy, x)
-            df = sp.lambdify(x, df_sympy, 'numpy')
-        except (sp.SympifyError, TypeError, ValueError) as e:
-            return render_template('index.html', error=f"Invalid function: {e}")
+            function_str = request.form['function']
+            a_str = request.form['interval_a']
+            b_str = request.form['interval_b']
+            tolerance_str = request.form['tolerance']
 
-        try:
-            f(a)  # Test evaluation at interval endpoints
-            f(b)
-            df(a)
-            df(b)
-        except (ValueError, TypeError, ZeroDivisionError) as e:
-            return render_template('index.html', error=f"Function evaluation error at interval endpoints: {e}")
+            # Convert a b and tolerance to float
+            a = float(a_str)
+            b = float(b_str)
+            tolerance = float(tolerance_str)
 
-        # Algorithm Part
-        newton_root, newton_iterations, newton_errors = newton_raphson_method(f, df, (a + b) / 2, tolerance)
-        bisection_root, bisection_iterations, bisection_errors = bisection_method(f, a, b, tolerance)
+            # Check if the input is valid
+            if b >= a:
+                return render_template('index.html', error="Invalid interval: 'a' must be less than 'b'.")
+            if tolerance <= 0:
+                return render_template('index.html', error="Invalid tolerance: Tolerance must be greater then zero")
 
-        # Graph plotting
-        plt.figure(figsize=(8, 6))
-        plt.plot(newton_errors, label="Newton-Raphson")
-        plt.plot(bisection_errors, label="Bisection")
-        plt.xlabel("Iteration")
-        plt.ylabel("Error (Log Scale)")
-        plt.yscale("log")
-        plt.title("Convergence Comparison")
-        plt.grid(True)
+            x = sp.symbols('x')
 
-        # Image Part
-        img =  BytesIO()
-        plt.savefig(img, format='png')
-        plt.close()
-        img.seek(0)
-        plot_url = base64.b64encode(img.getvalue()).decode('utf8')
-        return render_template('index.html', newton_root=newton_root, newton_iterations=newton_iterations, 
-                bisection_root=bisection_root, bisection_iterations=bisection_iterations, plot_url=plot_url
-                a_str=a_str, b_str=b_str, tolerance=tolerance_str)
+            try:
+                f_sympy = sp.sympify(function_str)
+                f = sp.lambdify(x, f_sympy, 'numpy')
+                df_sympy = sp.diff(f_sympy, x)
+                df = sp.lambdify(x, df_sympy, 'numpy')
+            except (sp.SympifyError, TypeError, ValueError) as e:
+                return render_template('index.html', error=f"Invalid function: {e}")
+
+            try:
+                f(a)  # Test evaluation at interval endpoints
+                f(b)
+                df(a)
+                df(b)
+            except (ValueError, TypeError, ZeroDivisionError) as e:
+                return render_template('index.html', error=f"Function evaluation error at interval endpoints: {e}")
+
+            # Algorithm Part
+            newton_root, newton_iterations, newton_errors = newton_raphson_method(f, df, (a + b) / 2, tolerance)
+            bisection_root, bisection_iterations, bisection_errors = bisection_method(f, a, b, tolerance)
+
+            # Graph plotting
+            plt.figure(figsize=(8, 6))
+            plt.plot(newton_errors, label="Newton-Raphson")
+            plt.plot(bisection_errors, label="Bisection")
+            plt.xlabel("Iteration")
+            plt.ylabel("Error (Log Scale)")
+            plt.yscale("log")
+            plt.title("Convergence Comparison")
+            plt.grid(True)
+
+            # Image Part
+            img =  BytesIO()
+            plt.savefig(img, format='png')
+            plt.close()
+            img.seek(0)
+            plot_url = base64.b64encode(img.getvalue()).decode('utf8')
+            return render_template('index.html', newton_root=newton_root, newton_iterations=newton_iterations, 
+                    bisection_root=bisection_root, bisection_iterations=bisection_iterations, plot_url=plot_url,
+                    a_str=a_str, b_str=b_str, tolerance=tolerance_str)
+        except (ValueError, TypeError) as e:
+            return render_template('index.html', error=f"Input error: Please enter valid numbers.  Details: {e}")
+        except Exception as e:
+             return render_template('index.html', error=f"An unexpected error occurred: {e}")
 
     return render_template('index.html')
 

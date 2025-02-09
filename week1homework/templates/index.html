@@ -1,12 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=\, initial-scale=1.0">
-    <title>Finding Root website</title>
-</head>
-<body>
-    <input type="text" id="function" placeholder="Enter Mathmatical expression: ">
-    <input type="text" id="a_str" placeholder="Enter Guess: ">
-</body>
+<html>
+    <head>
+        <title>Root Finder</title>
+    </head>
+    <body>
+        <h1>Root Finder</h1>
+
+        <form method="POST">
+            Function (e.g., x**2 - 5*sin(x) + x - 1): <input type="text" name="function" value="{{ function_str|default('') }}"><br><br> Interval Start (a): <input type="text" name="a" value="{{ a|default('') }}"><br><br>
+            Interval End (b): <input type="text" name="b" value="{{ b|default('') }}"><br><br>
+            Tolerance: <input type="text" name="tolerance" value="{{ tol|default('') }}"><br><br>
+            <input type="submit" value="Find Roots">
+        </form>
+
+        {% if error %}
+        <p style="color: red;">Error: {{ error }}</p>
+        {% endif %}
+
+        {% if newton_root is not none %}
+            <h2>Results</h2>
+            <p>Newton's Method:</p>
+            <ul>
+                <li>Root: {{ newton_root }}</li>
+                <li>Iterations: {{ newton_iterations }}</li>
+            </ul>
+        {% elif newton_iterations == -1 %}
+            <p>Newton's Method: Failed to converge.</p>
+        {% endif %}
+
+
+        {% if bisection_root is not none %}
+            <p>Bisection Method:</p>
+            <ul>
+                <li>Root: {{ bisection_root }}</li>
+                <li>Iterations: {{ bisection_iterations }}</li>
+            </ul>
+        {% elif bisection_iterations == -1 %}
+        <p>Bisection Method: Failed to converge (no sign change in interval).</p>
+        {% endif %}
+
+        {% if plot_url %}
+            <h2>Convergence Plot</h2>
+            <img src="data:image/png;base64,{{ plot_url }}" alt="Convergence Plot">
+        {% endif %}
+    </body>
 </html>
