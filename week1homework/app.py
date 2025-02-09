@@ -40,49 +40,57 @@ def index():
 @app.route("calculate", methods=['POST'])
 def calculate():
     # Input Part
-    function_str = request.form['function']
-    a_str = request.form['interval_a']
-    b_str = request.form['interval_b']
-    tolerance_str = request.form['tolerance']
+    if request.method == 'POST':
+        function_str = request.form['function']
+        a_str = request.form['interval_a']
+        b_str = request.form['interval_b']
+        tolerance_str = request.form['tolerance']
 
-    # Convert a b and tolerance to float
-    a = float(a_str)
-    b = float(b_str)
-    tolerance = float(tolerance_str)
-    del a_str, b_str, tolerance_str
+        # Convert a b and tolerance to float
+        a = float(a_str)
+        b = float(b_str)
+        tolerance = float(tolerance_str)
+        del a_str, b_str, tolerance_str
 
-    # Check if the input is valid
-    if b >= a:
-        return render_template('index.html', error="Invalid interval: 'a' must be less than 'b'.")
-    if tolerance <= 0:
-        return render_template('index.html', error="Invalid tolerance: Tolerance must be greater then zero")
+        # Check if the input is valid
+        if b >= a:
+            return render_template('index.html', error="Invalid interval: 'a' must be less than 'b'.")
+        if tolerance <= 0:
+            return render_template('index.html', error="Invalid tolerance: Tolerance must be greater then zero")
 
-    x = sp.symbols('x')
+        x = sp.symbols('x')
 
-    try:
-        f_sympy = sp.sympify(function_str)
-        f = sp.lambdify(x, f_sympy, 'numpy')
-        df_sympy = sp.diff(f_sympy, x)
-        df = sp.lambdify(x, df_sympy, 'numpy')
-    except (sp.SympifyError, TypeError, ValueError) as e:
-        return render_template('index.html', error=f"Invalid function: {e}")
+        try:
+            f_sympy = sp.sympify(function_str)
+            f = sp.lambdify(x, f_sympy, 'numpy')
+            df_sympy = sp.diff(f_sympy, x)
+            df = sp.lambdify(x, df_sympy, 'numpy')
+        except (sp.SympifyError, TypeError, ValueError) as e:
+            return render_template('index.html', error=f"Invalid function: {e}")
 
-    try:
-        f(a)  # Test evaluation at interval endpoints
-        f(b)
-        df(a)
-        df(b)
-    except (ValueError, TypeError, ZeroDivisionError) as e:
-        return render_template('index.html', error=f"Function evaluation error at interval endpoints: {e}")
+        try:
+            f(a)  # Test evaluation at interval endpoints
+            f(b)
+            df(a)
+            df(b)
+        except (ValueError, TypeError, ZeroDivisionError) as e:
+            return render_template('index.html', error=f"Function evaluation error at interval endpoints: {e}")
 
-    # Algorithm Part
-    newton_root, newton_iterations, newton_errors = newton_raphson_method(f, df, (a + b) / 2, tolerance)
-    bisection_root, bisection_iterations, bisection_errors = bisection_method(f, a, b, tolerance)
+        # Algorithm Part
+        newton_root, newton_iterations, newton_errors = newton_raphson_method(f, df, (a + b) / 2, tolerance)
+        bisection_root, bisection_iterations, bisection_errors = bisection_method(f, a, b, tolerance)
 
-    # Graph plotting
-    plt.figure(figsize=(8, 6)
-    plt.plot(newton_errors, label="Newton-Raphson")
-    plt.plot(bisection_errors, label="Bisection")
+        # Graph plotting
+        plt.figure(figsize=(8, 6)
+        plt.plot(newton_errors, label="Newton-Raphson")
+        plt.plot(bisection_errors, label="Bisection")
+        plt.xlabel("Iteration")
+        plt.ylabel("Error (Log Scale)")
+        plt.yscale("log")
+        plt.title("Convergence Comparison")
+        plt.grid(True)
+        
+    return render_template('index.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
