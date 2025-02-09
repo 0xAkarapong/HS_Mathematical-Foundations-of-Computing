@@ -35,7 +35,7 @@ def newton_raphson_method(f, x0, tolerance, max_iterations=100):
 
 @app.route("/")
 def index():
-    render_template('home.html')
+    render_template('index.html')
 
 @app.route("calculate", methods=['POST'])
 def calculate():
@@ -53,9 +53,9 @@ def calculate():
 
     # Check if the input is valid
     if b >= a:
-        return "Interval a must be less than b"
+        return render_template('index.html', error="Invalid interval: 'a' must be less than 'b'.")
     if tolerance <= 0:
-        return "Tolerance must be greater than 0"
+        return render_template('index.html', error="Invalid tolerance: Tolerance must be greater then zero")
 
     x = sp.symbols('x')
 
@@ -64,8 +64,8 @@ def calculate():
         f = sp.lambdify(x, f_sympy, 'numpy')
         df_sympy = sp.diff(f_sympy, x)
         df = sp.lambdify(x, df_sympy, 'numpy')
-    except:
-        return "Invalid function"
+    except (sp.SympifyError, TypeError, ValueError) as e:
+        return render_template('index.html', error=f"Invalid function: {e}")
 
 
 if __name__ == "__main__":
