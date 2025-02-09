@@ -51,7 +51,6 @@ def calculate():
         a = float(a_str)
         b = float(b_str)
         tolerance = float(tolerance_str)
-        del a_str, b_str, tolerance_str
 
         # Check if the input is valid
         if b >= a:
@@ -97,7 +96,9 @@ def calculate():
         plt.close()
         img.seek(0)
         plot_url = base64.b64encode(img.getvalue()).decode('utf8')
-
+        return render_template('index.html', newton_root=newton_root, newton_iterations=newton_iterations, 
+                bisection_root=bisection_root, bisection_iterations=bisection_iterations, plot_url=plot_url
+                a_str=a_str, b_str=b_str, tolerance=tolerance_str)
 
     return render_template('index.html')
 
