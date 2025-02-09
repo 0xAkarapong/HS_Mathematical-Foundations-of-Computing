@@ -81,7 +81,7 @@ def calculate():
         bisection_root, bisection_iterations, bisection_errors = bisection_method(f, a, b, tolerance)
 
         # Graph plotting
-        plt.figure(figsize=(8, 6)
+        plt.figure(figsize=(8, 6))
         plt.plot(newton_errors, label="Newton-Raphson")
         plt.plot(bisection_errors, label="Bisection")
         plt.xlabel("Iteration")
