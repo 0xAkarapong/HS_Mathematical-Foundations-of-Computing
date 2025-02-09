@@ -3,6 +3,7 @@ import sympy as sp
 import matplotlib.pyplot as plt
 import numpy as np
 from io import BytesIO
+import base64
 
 app = Flask(__name__)
 
