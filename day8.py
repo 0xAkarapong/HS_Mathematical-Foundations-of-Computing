@@ -63,11 +63,14 @@ def run_interpolation_experiment(func, func_label, a, b, m):
 def main():
     a = 0.0
     b = 4.0
-    m = 7
-
-    run_interpolation_experiment(np.sin, "sin(x)", a, b, m)
-    run_interpolation_experiment(lambda x: np.sin(3*x), "sin(3x)", a, b, m)
-    run_interpolation_experiment(lambda x: np.sin(5*x), "sin(5x)", a, b, m)
+    # Try different numbers of interpolation points; change m as desired.
+    m_list = [12]
+    
+    for m in m_list:
+        print(f"\nExperiment with m = {m} points")
+        run_interpolation_experiment(np.sin, "sin(x)", a, b, m)
+        run_interpolation_experiment(lambda x: np.sin(3*x), "sin(3x)", a, b, m)
+        run_interpolation_experiment(lambda x: np.sin(5*x), "sin(5x)", a, b, m)
 
 if __name__ == "__main__":
     main()
