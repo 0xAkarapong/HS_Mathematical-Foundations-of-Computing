@@ -71,7 +71,7 @@ def main():
     if input_method == '1':  # Function Input
         while True:
             try:
-                function_str = input("Enter the function (e.g., x*np.sin(x) - x**2 + 1): ")
+                function_str = input("Enter the function (e.g., x * sin(x) - x**2 + 1): ")
                 x_sym = Symbol('x')
                 function_expr = parse_expr(function_str, local_dict={'x': x_sym, 'np': np})
                 function = lambdify(x_sym, function_expr, "numpy") # Convert to a callable function
